@@ -15,19 +15,22 @@ INPUT_MAX_EVENTS    = 200
 OUTPUT_FILE_NAME    = "HiForest_2025PbPb.root"
 
 INCLUDE_CENTRALITY  = False
-INCLUDE_DEDX        = True
 INCLUDE_FSC         = True
-INCLUDE_HLT_OBJ     = True
+INCLUDE_HLT_OBJ     = False
 INCLUDE_JETS        = True # ak jets
-_jetPtMin           = 5
+_jetPtMin           = 15
 _jetAbsEtaMax       = 2.5
 _jetLabels          = ["0"] # "0" for original mini-AOD jets, otherwise use R value, e.g. 3,4,8
-INCLUDE_L1_OBJ      = True
+INCLUDE_L1_OBJ      = False
 INCLUDE_MUONS       = False
-INCLUDE_PF_TREE     = True
+INCLUDE_PF_TREE     = False
 _pfPtMin            = 0.1
-_pfAbsEtaMax        = 6.
+_pfAbsEtaMax        = 6.0
 INCLUDE_PPS         = False
+INCLUDE_TRACKS      = True
+_doTrackDedx        = True
+_trackPtMin         = 0.3
+_trackEtaMax        = 3.0
 INCLUDE_ZDC         = True
 
 DEBUG_EDM           = False
@@ -98,7 +101,7 @@ if INCLUDE_PF_TREE :
     process.particleFlowAnalyser.absEtaMax = cms.double(_pfAbsEtaMax)
 process.load('HeavyIonsAnalysis.EventAnalysis.hievtanalyzer_data_cfi')
 process.hiEvtAnalyzer.doHFfilters = cms.bool(False)
-process.hiEvtAnalyzer.doCentrality = cms.bool(True) # set False for UPCs
+process.hiEvtAnalyzer.doCentrality = cms.bool(False)
 process.load('HeavyIonsAnalysis.EventAnalysis.skimanalysis_cfi')
 if INCLUDE_HLT_OBJ :
     process.load('HeavyIonsAnalysis.EventAnalysis.hltobject_cfi')
@@ -114,13 +117,16 @@ process.ggHiNtuplizer.useValMapIso = cms.bool(False) # True here causes seg faul
 process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 
 # tracks
-process.load("HeavyIonsAnalysis.TrackAnalysis.TrackAnalyzers_cff")
-if INCLUDE_DEDX :
-    process.ppTracks.dedxEstimators = cms.VInputTag([
-      "dedxEstimator:dedxAllLikelihood",
-      "dedxEstimator:dedxPixelLikelihood",
-      "dedxEstimator:dedxStripLikelihood"
-    ])
+if INCLUDE_TRACKS :
+    process.load("HeavyIonsAnalysis.TrackAnalysis.TrackAnalyzers_cff")
+    process.ppTracks.trackPtMin = cms.untracked.double(_trackPtMin)
+    process.ppTracks.trackEtaMax = cms.untracked.double(_trackEtaMax)
+    if _doTrackDedx :
+        process.PbPbTracks.dedxEstimators = cms.VInputTag([
+          "dedxEstimator:dedxAllLikelihood",
+          "dedxEstimator:dedxPixelLikelihood",
+          "dedxEstimator:dedxStripLikelihood"
+        ])
 
 # muons
 if INCLUDE_MUONS :
@@ -146,7 +152,7 @@ process.forest = cms.Path(
     process.HiForestInfo +
     process.hltanalysis +
     process.l1MetFilterRecoTree +
-    process.trackSequencePP +
+    process.trackSequencePbPb +
     process.hiEvtAnalyzer
 )
 
@@ -172,48 +178,59 @@ if INCLUDE_MUONS :
 ###############################################################################
 
 # jet reco sequence
-process.load('HeavyIonsAnalysis.JetAnalysis.ak4PFJetSequence_ppref_data_cff')
+if INCLUDE_JETS :
+    process.load('HeavyIonsAnalysis.JetAnalysis.ak4PFJetSequence_ppref_data_cff')
 
-# Select the types of jets filled
-matchJets = True        # Enables q/g and heavy flavor jet identification in MC
+    # Select the types of jets filled
+    matchJets = True        # Enables q/g and heavy flavor jet identification in MC
 
-# Choose which additional information is added to jet trees
-doHIJetID = True        # Fill jet ID and composition information branches
-doWTARecluster = False  # Add jet phi and eta for WTA axis
-doBtagging  =  False    # Note that setting to True increases computing time a lot
+    # Choose which additional information is added to jet trees
+    doHIJetID = True        # Fill jet ID and composition information branches
+    doWTARecluster = False  # Add jet phi and eta for WTA axis
+    doBtagging  =  False    # Note that setting to True increases computing time a lot
 
-# 0 means use original mini-AOD jets, otherwise use R value, e.g., 3,4,8
-# Add all the values you want to process to the list
-jetLabels = _jetLabels
+    # 0 means use original mini-AOD jets, otherwise use R value, e.g., 3,4,8
+    # Add all the values you want to process to the list
+    jetLabels = _jetLabels
 
-# add candidate tagging for all selected jet radii
-from HeavyIonsAnalysis.JetAnalysis.setupJets_ppRef_cff import candidateBtaggingMiniAOD
+    # add candidate tagging for all selected jet radii
+    from HeavyIonsAnalysis.JetAnalysis.setupJets_ppRef_cff import candidateBtaggingMiniAOD
 
-for jetLabel in jetLabels:
-    candidateBtaggingMiniAOD(process, isMC = False, jetPtMin = _jetPtMin, jetCorrLevels = ['L2Relative', 'L3Absolute'], doBtagging = doBtagging, labelR = jetLabel)
+    for jetLabel in jetLabels:
+        candidateBtaggingMiniAOD(
+            process,
+            isMC = False,
+            jetPtMin = _jetPtMin,
+#            jetCorrLevels = ['L2Relative', 'L3Absolute'],
+            jetCorrLevels = ['L2Relative', 'L2L3Residual'],
+            doBtagging = doBtagging,
+            labelR = jetLabel
+        )
 
-    # setup jet analyzer
-    setattr(process,"ak"+jetLabel+"PFJetAnalyzer",process.ak4PFJetAnalyzer.clone())
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetTag = "selectedUpdatedPatJetsAK"+jetLabel+"PFCHSBtag"
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetName = 'ak'+jetLabel+'PF'
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").matchJets = matchJets
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").matchTag = 'patJetsAK'+jetLabel+'PFUnsubJets'
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").doBtagging = doBtagging
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").doHiJetID = doHIJetID
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").doWTARecluster = doWTARecluster
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetPtMin = _jetPtMin
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetAbsEtaMax = cms.untracked.double(_jetAbsEtaMax)
-    getattr(process,"ak"+jetLabel+"PFJetAnalyzer").rParam = 0.4 if jetLabel=='0' else float(jetLabel)*0.1
-    if doBtagging:
-        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").pfJetProbabilityBJetTag = cms.untracked.string("pfJetProbabilityBJetTagsAK"+jetLabel+"PFCHSBtag")
-        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").pfUnifiedParticleTransformerAK4JetTags = cms.untracked.string("pfUnifiedParticleTransformerAK4JetTagsAK"+jetLabel+"PFCHSBtag")
-    process.forest += getattr(process,"ak"+jetLabel+"PFJetAnalyzer")
+        # setup jet analyzer
+        setattr(process,"ak"+jetLabel+"PFJetAnalyzer",process.ak4PFJetAnalyzer.clone())
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetTag = "selectedUpdatedPatJetsAK"+jetLabel+"PFCHSBtag"
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetName = 'ak'+jetLabel+'PF'
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").matchJets = matchJets
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").matchTag = 'patJetsAK'+jetLabel+'PFUnsubJets'
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").doBtagging = doBtagging
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").doHiJetID = doHIJetID
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").doWTARecluster = doWTARecluster
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetPtMin = _jetPtMin
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").jetAbsEtaMax = cms.untracked.double(_jetAbsEtaMax)
+        getattr(process,"ak"+jetLabel+"PFJetAnalyzer").rParam = 0.4 if jetLabel=='0' else float(jetLabel)*0.1
+        if doBtagging:
+            getattr(process,"ak"+jetLabel+"PFJetAnalyzer").pfJetProbabilityBJetTag = cms.untracked.string("pfJetProbabilityBJetTagsAK"+jetLabel+"PFCHSBtag")
+            getattr(process,"ak"+jetLabel+"PFJetAnalyzer").pfUnifiedParticleTransformerAK4JetTags = cms.untracked.string("pfUnifiedParticleTransformerAK4JetTagsAK"+jetLabel+"PFCHSBtag")
+        process.forest += getattr(process,"ak"+jetLabel+"PFJetAnalyzer")
+
+#Winter25Prompt25_RunF_V2_DATA
 
 ###############################################################################
 
 # Event Selection -> add the needed filters here
 process.load('HeavyIonsAnalysis.EventAnalysis.collisionEventSelection_cff')
-process.pclusterCompatibilityFilter = cms.Path(process.clusterCompatibilityFilter)
+#process.pclusterCompatibilityFilter = cms.Path(process.clusterCompatibilityFilter)
 process.pprimaryVertexFilter = cms.Path(process.primaryVertexFilter)
 process.load('HeavyIonsAnalysis.EventAnalysis.hffilterPF_cfi')
 process.pAna = cms.EndPath(process.skimanalysis)

@@ -10,7 +10,8 @@ username = getUsername()
 # INPUT/OUTPUT SETTINGS
 
 pd = '0'
-jobTag = 'LowPUpp_SpecialHLTPhysics' + pd
+run = '398647'
+jobTag = 'LowPUpp_SpecialHLTPhysics' + pd + '_' + run
 cmsswConfig = 'forest_CMSSWConfig_Run3_150X_2025LowPUpp_DATA.py'
 
 isOnDAS = False
@@ -18,7 +19,7 @@ isOnDAS = False
 input = '/SpecialHLTPhysics' + pd + '/ppRun2025-PromptReco-v1/MINIAOD'
 inputDatabase = 'global'
 # Otherwise, use a filelist as input:
-inputFilelist = 'filelist_SpecialHLTPhysics' + pd + '.txt'
+inputFilelist = 'filelist_SpecialHLTPhysics' + pd + '_' + run + '.txt'
 
 output = '/store/group/phys_heavyions/' + username + '/Run3_2025LowPUpp_ExpressForests/'
 outputServer = 'T2_CH_CERN'
@@ -33,7 +34,7 @@ config.General.transferOutputs = True
 
 config.JobType.psetName = cmsswConfig
 config.JobType.pluginName = 'Analysis'
-config.JobType.maxMemoryMB = 5000
+config.JobType.maxMemoryMB = 3000
 config.JobType.pyCfgParams = ['noprint']
 config.JobType.allowUndistributedCMSSW = True
 
@@ -50,9 +51,9 @@ else :
     config.Data.splitting = 'FileBased'
     config.Data.unitsPerJob = 1
     config.Data.totalUnits = -1
-
 config.Data.outLFNDirBase = output
 config.Data.publication = False
 config.Data.allowNonValidInputDataset = True
 
+config.Site.whitelist = ['T2_CH_CERN']
 config.Site.storageSite = outputServer
