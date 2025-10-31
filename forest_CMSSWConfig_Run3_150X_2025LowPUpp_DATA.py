@@ -15,12 +15,13 @@ INPUT_MAX_EVENTS    = 200
 OUTPUT_FILE_NAME    = "HiForest_2025LowPUpp.root"
 
 INCLUDE_CENTRALITY  = False
+INCLUDE_EGAMMA      = True
 INCLUDE_FSC         = False
 INCLUDE_HLT_OBJ     = True
 INCLUDE_JETS        = True # ak jets
 _jetPtMin           = 15
 _jetAbsEtaMax       = 2.5
-_jetLabels          = ["0"] # "0" for original mini-AOD jets, otherwise use R value, e.g. 3,4,8
+_jetLabels          = ["0"] # "0" uses reco jets, otherwise recluster with R value, e.g. 3,4,8
 INCLUDE_L1_OBJ      = True
 INCLUDE_MUONS       = False
 INCLUDE_PF_TREE     = False
@@ -110,11 +111,12 @@ if INCLUDE_L1_OBJ :
     process.load('HeavyIonsAnalysis.EventAnalysis.l1object_cfi')
 
 # electrons, photons, muons
-process.load('HeavyIonsAnalysis.EGMAnalysis.ggHiNtuplizer_cfi')
-process.ggHiNtuplizer.doGenParticles = cms.bool(False)
-process.ggHiNtuplizer.doMuons = cms.bool(False)
-process.ggHiNtuplizer.useValMapIso = cms.bool(False) # True here causes seg fault
-process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
+if INCLUDE_EGAMMA :
+    process.load('HeavyIonsAnalysis.EGMAnalysis.ggHiNtuplizer_cfi')
+    process.ggHiNtuplizer.doGenParticles = cms.bool(False)
+    process.ggHiNtuplizer.doMuons = cms.bool(False)
+    process.ggHiNtuplizer.useValMapIso = cms.bool(False) # True here causes seg fault
+    process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 
 # tracks
 if INCLUDE_TRACKS :
@@ -164,16 +166,17 @@ if INCLUDE_PF_TREE :
     process.forest += process.particleFlowAnalyser
 if INCLUDE_CENTRALITY :
     process.forest += process.centralityBin
-if INCLUDE_ZDC :
+if INCLUDE_EGAMMA :
+    process.forest += process.ggHiNtuplizer
+if INCLUDE_MUONS :
+    process.forest += process.unpackedMuons
+    process.forest += process.muonAnalyzer
+if INCLUDE_ZDC or INCLUDE_FSC or INCLUDE_PPS :
     process.forest += process.zdcSequencePbPb
 if INCLUDE_FSC :
     process.forest += process.fscSequence
 if INCLUDE_PPS :
     process.forest += process.ppsSequence
-if INCLUDE_MUONS :
-    process.forest += process.ggHiNtuplizer
-    process.forest += process.unpackedMuons
-    process.forest += process.muonAnalyzer
 
 ###############################################################################
 
