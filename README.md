@@ -62,8 +62,8 @@ git pull upstream main
 
 ### 1.1) Install CMSSW
 ```bash
-cmsrel CMSSW_15_1_0_patch2
-cd CMSSW_15_1_0_patch2/src
+cmsrel CMSSW_15_1_0_patch3
+cd CMSSW_15_1_0_patch3/src
 cmsenv
 ```
 
