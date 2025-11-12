@@ -1,6 +1,6 @@
-# 2025 PbPb
+# 2025 PbPb UPC
 # CMSSW_15_1_0_patch3
-# ZeroBias[0-??]
+# HIForward[0-??]
 
 from CRABClient.UserUtilities import config
 from CRABClient.UserUtilities import getUsername
@@ -11,17 +11,17 @@ username = getUsername()
 
 pd = '0'
 run = '399306'
-jobTag = 'PbPb_HIZeroBias' + pd + '_' + run
-cmsswConfig = 'forest_CMSSWConfig_Run3_151X_2025PbPb_DATA.py'
+jobTag = 'PbPbUPC_HIForward' + pd + '_' + run
+cmsswConfig = 'forest_CMSSWConfig_Run3_151X_2025PbPb_DATA_UPC.py'
 
 isOnDAS = False
 # If isOnDAS == True, use these inputs:
-input = '/HIZeroBias' + pd + '/PbPbRun2025-PromptReco-v1/MINIAOD'
+input = '/HIForward' + pd + '/PbPbRun2025-PromptReco-v1/MINIAOD'
 inputDatabase = 'global'
 # Otherwise, use a filelist as input:
-inputFilelist = 'filelist_HIZeroBias' + pd + '_' + run + '.txt'
+inputFilelist = 'filelist_HIForward' + pd + '_' + run + '.txt'
 
-output = '/store/group/phys_heavyions/' + username + '/Run3_2025PbPb_ExpressForests/'
+output = '/store/group/phys_heavyions/' + username + '/Run3_2025PbPbUPC_ExpressForests/'
 outputServer = 'T2_CH_CERN'
 
 ###############################################################################

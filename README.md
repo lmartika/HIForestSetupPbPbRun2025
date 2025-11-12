@@ -31,11 +31,13 @@ cd CMSSW_15_0_15_patch4/src
 cmsenv
 ```
 
+
 ### 1.2) Add CMS Heavy Ion foresting tools
 ```bash
 git cms-merge-topic CmsHI:forest_CMSSW_15_0_X
 scram build -j4
 ```
+
 
 ### 1.3) Clone this repository and add your remote repo
 **On github.com**, fork this repository to make your own version. This will be used
@@ -43,13 +45,13 @@ to document your forest configs.
 
 Next, clone your forked version of this repo:
 ```bash
-git clone git@github.com:<your_git_username>/HiForestSetupPbPbRun2025.git
-cd HiForestSetupPbPbRun2025/
+git clone git@github.com:<your_git_username>/HIForestSetupPbPbRun2025.git
+cd HIForestSetupPbPbRun2025/
 ```
 
 Finally, add the original repo as an "upstream" repo:
 ```bash
-git remote add upstream git@github.com:jdlang/HiForestSetupPbPbRun2025.git
+git remote add upstream git@github.com:jdlang/HIForestSetupPbPbRun2025.git
 git fetch upstream
 git pull upstream main
 ```
@@ -67,9 +69,18 @@ cd CMSSW_15_1_0_patch3/src
 cmsenv
 ```
 
+
 ### 1.2) Add CMS Heavy Ion foresting tools
 ```bash
 git cms-merge-topic CmsHI:forest_CMSSW_15_1_X
+scram build -j4
+```
+
+**To use Dfinder**, add the repo below and recompile:
+```bash
+git clone -b Dfinder_14XX_miniAOD git@github.com:boundino/Bfinder.git --depth 1
+sed -i "s|forest_miniAOD_run3_UPC_23rereco_DATA|forest_miniAOD_run3_UPC_23rereco_DATA_wDfinder|" Bfinder/test/DnBfinder_to_Forest.sh
+source Bfinder/test/DnBfinder_to_Forest.shx
 scram build -j4
 ```
 
@@ -79,14 +90,15 @@ scram build -j4
 > git remote add cmshi git@github.com:CmsHI/cmssw.git
 > ```
 
+
 ### 1.3) Clone this repository and add your remote repo
 **On github.com**, fork this repository to make your own version. This will be used
 to document your forest configs.
 
 Next, clone your forked version of this repo:
 ```bash
-git clone git@github.com:<your_git_username>/HiForestSetupPbPbRun2025.git
-cd HiForestSetupPbPbRun2025/
+git clone git@github.com:<your_git_username>/HIForestSetupPbPbRun2025.git
+cd HIForestSetupPbPbRun2025/
 ```
 
 Finally, add the original repo as an "upstream" repo:

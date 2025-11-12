@@ -1,8 +1,8 @@
 ### HiForest CMSSW Configuration
-# Collisions: 2025 PbPb
+# Collisions: 2025 PbPb UPC
 # Input: miniAOD
 # Type: data
-# SW: CMSSW_15_1_0_patch3, forest_CMSSW_15_1_X
+# SW: CMSSW_15_1_0_patch3, forest_CMSSW_15_1_X, Dfinder_14XX_miniAOD
 
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Era_Run3_2025_cff import Run3_2025
@@ -15,7 +15,7 @@ INPUT_MAX_EVENTS    = 200
 OUTPUT_FILE_NAME    = "HiForest_2025PbPbUPC.root"
 
 INCLUDE_CENTRALITY  = False
-INCLUDE_DFINDER     = False
+INCLUDE_DFINDER     = True
 _includeD0          = 1     # 1 if true, 0 if false
 _includeLc          = 0     # 1 if true, 0 if false
 _DtkPtMin           = 0.1
