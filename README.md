@@ -1,6 +1,7 @@
 # 2025 CMS PbPb Run - Foresting
 **Last updated: 29 October 2025**
 
+* **Overview of Config Files**
 * **1A) Setup for Low-PU pp**
 * **1B) Setup for PbPb**
 * **2) Processing Forests**
@@ -13,11 +14,43 @@
 
 --------------------------------------------------------------------------------
 
+## Overview of Config Files
+
+### Low-PU pp Configs (use with CMSSW_15_0_X)
+* **CMSSW**
+  * `forest_CMSSWConfig_Run3_150X_2025LowPUpp_DATA.py`
+* **CRAB**
+  * `forest_CRABConfig_150X_2025LowPUpp_DATA_SpecialHLTPhysics.py`
+  * `forest_CRABConfig_150X_2025LowPUpp_DATA_SpecialZeroBias.py`
+
+### PbPb Configs (use with CMSSW_15_1_X)
+* **CMSSW**
+  * `forest_CMSSWConfig_Run3_151X_2025PbPb_DATA.py`: Intended for general PbPb
+    data (i.e. not UPC).
+  * `forest_CMSSWConfig_Run3_151X_2025PbPb_DATA_CaloTower.py`: Same as general
+    PbPb data config but adds `L1CaloTowerTree`. Should only be used with
+    private reco miniAOD that includes L1CaloTower info.
+  * `forest_CMSSWConfig_Run3_151X_2025PbPb_DATA_UPC.py`: Specifically for
+    PbPb UPC data. Uses Dfinder (see **Setup for PbPb**). Also includes
+    ZDC and FSC trees.
+* **CRAB**
+  * `forest_CRABConfig_151X_2025PbPb_DATA_ZeroBias.py`: CRAB template for
+    general PbPb data. Preset for ZeroBias PDs, modify for other PbPb data.
+  * `forest_CRABConfig_151X_2025PbPb_DATA_UPC_HIForward.py`: CRAB template for
+    UPC data from HIForward PDs. Modify for other UPC data.
+
 > [!TIP]
+> To test CMSSW configs, modify `INPUT_TEST_FILE` in the config and run with:
+> ```bash
+> cmsRun <forest_CMSSWConfig_XXX.py>
+> ```
+> 
 > To use CRAB for foresting, you will need to work from lxplus.
 > ```bash
 > ssh <your_cern_id>@lxplus.cern.ch
 > ```
+
+--------------------------------------------------------------------------------
 
 ## 1A) Setup for Low-PU pp
 
@@ -76,13 +109,14 @@ git cms-merge-topic CmsHI:forest_CMSSW_15_1_X
 scram build -j4
 ```
 
-**To use Dfinder**, add the repo below and recompile:
-```bash
-git clone -b Dfinder_14XX_miniAOD git@github.com:boundino/Bfinder.git --depth 1
-sed -i "s|forest_miniAOD_run3_UPC_23rereco_DATA|forest_miniAOD_run3_UPC_23rereco_DATA_wDfinder|" Bfinder/test/DnBfinder_to_Forest.sh
-source Bfinder/test/DnBfinder_to_Forest.shx
-scram build -j4
-```
+> [!IMPORTANT]
+> To use Dfinder, add the repo below and recompile:
+> ```bash
+> git clone -b Dfinder_14XX_miniAOD git@github.com:boundino/Bfinder.git --depth 1
+> sed -i "s|forest_miniAOD_run3_UPC_23rereco_DATA|forest_miniAOD_run3_UPC_23rereco_DATA_wDfinder|" Bfinder/test/DnBfinder_to_Forest.sh
+> source Bfinder/test/DnBfinder_to_Forest.shx
+> scram build -j4
+> ```
 
 > [!TIP] 
 > You can add CMSHI as a remote git reference in case of updates:
@@ -206,7 +240,8 @@ crab resubmit --maxmemory 2500 --maxruntime 300 -d CrabWorkArea/crab_<your job t
 > Requesting more than the maximum allowed memory or runtime will result in
 > your job being refused and **you will be unable to __resubmit__ any failed jobs
 > for that CRAB submission!** 
-> * `maxmemory` **must not exceed 5000** (MB)!
+> * `maxmemory` **must not exceed 3000 (MB)** for the initial submission,
+>   and must not exceed 5000 (MB) for resubmissions!
 > * `maxruntime` **must not exceed 900** (minutes)!
 
 If you need to stop a job before it finishes, use:
