@@ -12,7 +12,7 @@ HIFOREST_VERSION = "151X"
 GLOBAL_TAG = "151X_dataRun3_Prompt_Queue"
 INPUT_TEST_FILE = "/store/group/phys_heavyions/lamartik/RECO2025/test/recoPbPbrawPr2mini_RAW2DIGI_L1Reco_RECO_PAT.root"
 INPUT_MAX_EVENTS    = 200
-OUTPUT_FILE_NAME    = "HiForest_2025PbPb.root"
+OUTPUT_FILE_NAME    = "HiForest_2025PbPbCalo.root"
 
 INCLUDE_CENTRALITY  = False
 INCLUDE_DFINDER     = False
@@ -34,7 +34,7 @@ _pfPtMin            = 0.1
 _pfAbsEtaMax        = 6.0
 INCLUDE_PPS         = False # Only included in 2025 pO
 INCLUDE_TRACKS      = True
-_doTrackDedx        = False
+_doTrackDedx        = True
 _trackPtMin         = 0.3
 _trackEtaMax        = 3.0
 INCLUDE_ZDC         = True
@@ -101,6 +101,7 @@ if INCLUDE_CENTRALITY :
 # event analysis
 process.load('HeavyIonsAnalysis.EventAnalysis.hltanalysis_cfi')
 process.load('L1Trigger.L1TNtuples.l1MetFilterRecoTree_cfi')
+process.load('L1Trigger.L1TNtuples.l1CaloTowerTree_cfi')
 if INCLUDE_PF_TREE :
     process.load('HeavyIonsAnalysis.EventAnalysis.particleFlowAnalyser_cfi')
     process.particleFlowAnalyser.ptMin = cms.double(_pfPtMin)
@@ -126,10 +127,10 @@ if INCLUDE_EGAMMA :
 # tracks
 if INCLUDE_TRACKS :
     process.load("HeavyIonsAnalysis.TrackAnalysis.TrackAnalyzers_cff")
-    process.ppTracks.trackPtMin = cms.untracked.double(_trackPtMin)
-    process.ppTracks.trackEtaMax = cms.untracked.double(_trackEtaMax)
+    process.PbPbTracks.trackPtMin = cms.untracked.double(_trackPtMin)
+    process.PbPbTracks.trackEtaMax = cms.untracked.double(_trackEtaMax)
     if _doTrackDedx :
-        process.PbPbTracks.dedxEstimators = cms.VInputTag([
+        process.ppTracks.dedxEstimators = cms.VInputTag([
           "dedxEstimator:dedxAllLikelihood",
           "dedxEstimator:dedxPixelLikelihood",
           "dedxEstimator:dedxStripLikelihood"
@@ -159,6 +160,7 @@ process.forest = cms.Path(
     process.HiForestInfo +
     process.hltanalysis +
     process.l1MetFilterRecoTree +
+    process.l1CaloTowerTree +
     process.trackSequencePbPb +
     process.hiEvtAnalyzer
 )

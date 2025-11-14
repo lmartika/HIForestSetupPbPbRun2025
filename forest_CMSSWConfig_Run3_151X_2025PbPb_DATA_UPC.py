@@ -129,7 +129,7 @@ if INCLUDE_TRACKS :
     process.ppTracks.trackPtMin = cms.untracked.double(_trackPtMin)
     process.ppTracks.trackEtaMax = cms.untracked.double(_trackEtaMax)
     if _doTrackDedx :
-        process.ppTracks.dedxEstimators = cms.VInputTag([
+        process.PbPbTracks.dedxEstimators = cms.VInputTag([
           "dedxEstimator:dedxAllLikelihood",
           "dedxEstimator:dedxPixelLikelihood",
           "dedxEstimator:dedxStripLikelihood"
@@ -159,7 +159,7 @@ process.forest = cms.Path(
     process.HiForestInfo +
     process.hltanalysis +
     process.l1MetFilterRecoTree +
-    process.trackSequencePP +
+    process.trackSequencePbPb +
     process.hiEvtAnalyzer
 )
 
@@ -289,13 +289,13 @@ process.pprimaryVertexFilter = cms.Path(process.primaryVertexFilter)
 process.load('HeavyIonsAnalysis.EventAnalysis.hffilterPF_cfi')
 process.pAna = cms.EndPath(process.skimanalysis)
 
-process.HFAdcana = cms.EDAnalyzer("HFAdcToGeV",
-    digiLabel = cms.untracked.InputTag("hcalDigis"), # for Data
-    #digiLabel = cms.untracked.InputTag("simHcalUnsuppressedDigis","HFQIE10DigiCollection"), # for MC
-    minimized = cms.untracked.bool(True),
-    fillhf = cms.bool(False) # only turn this on when you have or know how to produce "towerMaker"
-)
-process.hfadc = cms.Path(process.HFAdcana)
+#process.HFAdcana = cms.EDAnalyzer("HFAdcToGeV",
+#    digiLabel = cms.untracked.InputTag("hcalDigis"), # for Data
+#    #digiLabel = cms.untracked.InputTag("simHcalUnsuppressedDigis","HFQIE10DigiCollection"), # for MC
+#    minimized = cms.untracked.bool(True),
+#    fillhf = cms.bool(False) # only turn this on when you have or know how to produce "towerMaker"
+#)
+#process.hfadc = cms.Path(process.HFAdcana)
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
