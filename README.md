@@ -148,7 +148,25 @@ git pull upstream main
 
 ## 2) Processing Forests
 
-### 2.1) Edit CRABConfig settings
+### 2.1) Check CMSSWConfig Era and Global Tag
+Confirm that your CMSSWConfig Era and Global Tag match the reco settings. These
+are the lines shown below (for example):
+```python
+import FWCore.ParameterSet.Config as cms
+from Configuration.Eras.Era_Run3_pp_on_PbPb_2025_cff import Run3_pp_on_PbPb_2025
+process = cms.Process('HiForest', Run3_pp_on_PbPb_2025)
+
+HIFOREST_VERSION = "151X"
+GLOBAL_TAG = "151X_dataRun3_Prompt_v1"
+```
+
+> [!TIP]
+> If you are foresting from PromptReco and have a CMS DAS path, click the
+> "Configs" link below the dataset entry on DAS
+> ([example](https://cmsweb.cern.ch/das/request?instance=prod/global&input=config+dataset%3D%2FHIForward0%2FHIRun2025A-PromptReco-v1%2FMINIAOD)),
+> and then click "show" to see the era and global tag used for reco.
+
+### 2.2) Edit CRABConfig settings
 Make a **copy** of the CRABConfig file with an appropriate name:
 ```bash
 cp forest_CRABConfig_Run3_PbPb_DATA_TEMPLATE.py forest_CRABConfig_Run3_PbPb_DATA_<your_label>.py
@@ -196,7 +214,7 @@ Explanation of variables:
 - `output` is the path on the output server. Forested files are saved here.
 - `outputServer` is the CMS T2 server where data will be stored.
 
-### 2.2) Initialize VOMS proxy
+### 2.3) Initialize VOMS proxy
 ```bash
 voms-proxy-init -rfc -voms cms
 ```
@@ -207,7 +225,7 @@ voms-proxy-init -rfc -voms cms
 > ```
 > This will let you initialize VOMS just by running the command: `proxy`
 
-### 2.3) Submit CRAB jobs (may need to be from `src`)
+### 2.4) Submit CRAB jobs (may need to be from `src`)
 ```bash
 cd ..
 # Copy CMSSW configs to "src"
@@ -216,7 +234,7 @@ cp HiForestSetupOORun2025/forest_CMSSWConfig* ..
 crab submit -c HiForestSetupOORun2025/forest_CRABConfig_Run3_OO_DATA_<your_label>.py
 ```
 
-### 2.4) Track status of CRAB jobs
+### 2.5) Track status of CRAB jobs
 You can view the status of a job with:
 ```bash
 crab status -d CrabWorkArea/crab_<your job tag>/
