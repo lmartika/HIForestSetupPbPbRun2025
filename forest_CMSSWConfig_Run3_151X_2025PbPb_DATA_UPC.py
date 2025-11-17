@@ -14,12 +14,13 @@ process = cms.Process('HiForest', Run3_pp_on_PbPb_2025)
 
 HIFOREST_VERSION = "151X"
 GLOBAL_TAG = "151X_dataRun3_Prompt_v1"
-INPUT_TEST_FILE = "/store/data/pORun2025/IonPhysics0/MINIAOD/PromptReco-v1/000/393/953/00000/01ffdb30-30c3-4cd4-ac03-6a8d99d564ab.root"
+INPUT_TEST_FILE = "file:/eos/cms/store/group/phys_heavyions/jbarajas/t0streamers/PhysicsHIForward/R399499/crab_RECO_PbPb_t0streamers_test_miniAOD_HIForward0_R399499_16_11_2025_vSmall/CRAB_UserFiles/crab_RECO_PbPb_t0streamers_test_miniAOD_HIForward0_R399499_16_11_2025_v0/251116_141241/0000/recoUPCraw2miniaod_RAW2DIGI_L1Reco_RECO_PAT_1.root"
+#INPUT_TEST_FILE = "/store/data/pORun2025/IonPhysics0/MINIAOD/PromptReco-v1/000/393/953/00000/01ffdb30-30c3-4cd4-ac03-6a8d99d564ab.root"
 INPUT_MAX_EVENTS    = 200
 OUTPUT_FILE_NAME    = "HiForest_2025PbPbUPC.root"
 
 INCLUDE_CENTRALITY  = False
-INCLUDE_DFINDER     = True
+INCLUDE_DFINDER     = False
 _includeD0          = 1     # 1 if true, 0 if false
 _includeLcpKpi      = 0     # 1 if true, 0 if false
 _includeLcpKs       = 0     # 1 if true, 0 if false
@@ -188,6 +189,7 @@ if INCLUDE_MUONS :
     process.forest += process.muonAnalyzer
 if INCLUDE_ZDC or INCLUDE_FSC or INCLUDE_PPS :
     process.forest += process.zdcSequencePbPb
+    process.zdcanalyzer.doZdcDigis = cms.bool(False)  # space-saving
 if INCLUDE_FSC :
     process.forest += process.fscSequence
 if INCLUDE_PPS :

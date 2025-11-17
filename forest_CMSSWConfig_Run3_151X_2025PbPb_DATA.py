@@ -32,7 +32,7 @@ INCLUDE_CSJETS      = True # akCS Jets
 _jetPtMinCS         = 15
 _jetAbsEtaMaxCS     = 5
 _jetLabelsCS        = ["4"] # R-values for collections of CS subtracted jets (only eta dependent background)
-_jetLabelsFlowCS    = ["4"] # R-values for flow subtracted CS jets (eta and phi dependent background)
+_jetLabelsFlowCS    = [] # R-values for flow subtracted CS jets (eta and phi dependent background)
 INCLUDE_L1_OBJ      = True
 INCLUDE_MUONS       = True
 INCLUDE_PF_TREE     = False
@@ -184,6 +184,7 @@ if INCLUDE_MUONS :
     process.forest += process.muonAnalyzer
 if INCLUDE_ZDC or INCLUDE_FSC or INCLUDE_PPS :
     process.forest += process.zdcSequencePbPb
+    process.zdcanalyzer.doZdcDigis = cms.bool(False)  # space-saving
 if INCLUDE_FSC :
     process.forest += process.fscSequence
 if INCLUDE_PPS :
