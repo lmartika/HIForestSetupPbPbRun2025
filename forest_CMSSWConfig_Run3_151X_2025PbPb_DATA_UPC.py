@@ -5,11 +5,15 @@
 # SW: CMSSW_15_1_0_patch3, forest_CMSSW_15_1_X, Dfinder_14XX_miniAOD
 
 import FWCore.ParameterSet.Config as cms
+#from Configuration.Eras.Era_Run3_2025_UPC_cff import Run3_2025_UPC
+#process = cms.Process('HiForest', Run3_2025_UPC)
+
 from Configuration.Eras.Era_Run3_pp_on_PbPb_2025_cff import Run3_pp_on_PbPb_2025
 process = cms.Process('HiForest', Run3_pp_on_PbPb_2025)
 
+
 HIFOREST_VERSION = "151X"
-GLOBAL_TAG = "151X_dataRun3_Prompt_Queue"
+GLOBAL_TAG = "151X_dataRun3_Prompt_v1"
 INPUT_TEST_FILE = "/store/data/pORun2025/IonPhysics0/MINIAOD/PromptReco-v1/000/393/953/00000/01ffdb30-30c3-4cd4-ac03-6a8d99d564ab.root"
 INPUT_MAX_EVENTS    = 200
 OUTPUT_FILE_NAME    = "HiForest_2025PbPbUPC.root"
@@ -24,11 +28,11 @@ _DtkEtaMax          = 2.4
 INCLUDE_EGAMMA      = True
 INCLUDE_FSC         = True
 INCLUDE_HLT_OBJ     = True
-INCLUDE_JETS        = False # ak Jets
-_jetPtMin           = 15
-_jetAbsEtaMax       = 5
+INCLUDE_JETS        = True # ak Jets
+_jetPtMin           = 10
+_jetAbsEtaMax       = 5.2
 _jetLabels          = ["0"] # "0" uses reco jets, otherwise recluster with R value, e.g. 3,4,8
-INCLUDE_CSJETS      = True # akCS Jets
+INCLUDE_CSJETS      = False # akCS Jets
 _jetPtMinCS         = 15
 _jetAbsEtaMaxCS     = 5
 _jetLabelsCS        = ["4"] # R-values for collections of CS subtracted jets (only eta dependent background)
@@ -259,7 +263,7 @@ if INCLUDE_CSJETS :
         candidateBtaggingMiniAOD(
             process,
             isMC = False,
-            jetPtMin = jetPtMin,
+            jetPtMin = _jetPtMinCS,
             jetCorrLevels = ['L2Relative', 'L2L3Residual'],
             doBtagging = doBtagging,
             labelR = jetLabel
@@ -330,7 +334,7 @@ if INCLUDE_DFINDER :
         0.,  0.,    # D0(K-pi-pi+pi+)pi+ : D+*
         0.,  0.,    # D0bar(K+pi+)pi+ : B+
         0.9, 0.9,   # p+k-pi+: lambdaC+
-        0.9, 0.9.,  # p+Ks(pi+pi-): lambdaC+
+        0.9, 0.9  # p+Ks(pi+pi-): lambdaC+
     )
     process.Dfinder.printInfo = cms.bool(False)
     process.Dfinder.dropUnusedTracks = cms.bool(True)

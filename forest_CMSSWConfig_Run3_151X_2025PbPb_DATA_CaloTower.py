@@ -261,7 +261,7 @@ if INCLUDE_CSJETS :
         candidateBtaggingMiniAOD(
             process,
             isMC = False,
-            jetPtMin = jetPtMin,
+            jetPtMin = _jetPtMinCS,
             jetCorrLevels = ['L2Relative', 'L2L3Residual'],
             doBtagging = doBtagging,
             labelR = jetLabel
@@ -332,7 +332,7 @@ if INCLUDE_DFINDER :
         0.,  0.,    # D0(K-pi-pi+pi+)pi+ : D+*
         0.,  0.,    # D0bar(K+pi+)pi+ : B+
         0.9, 0.9,   # p+k-pi+: lambdaC+
-        0.9, 0.9.,  # p+Ks(pi+pi-): lambdaC+
+        0.9, 0.9  # p+Ks(pi+pi-): lambdaC+
     )
     process.Dfinder.printInfo = cms.bool(False)
     process.Dfinder.dropUnusedTracks = cms.bool(True)
